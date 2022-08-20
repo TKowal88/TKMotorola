@@ -4,6 +4,7 @@ import java.util.Scanner;
 import java.util.InputMismatchException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.lang.Character;
 
 public class Game {
     public static class Load {
@@ -42,6 +43,8 @@ public class Game {
     public static class Game1 {
         String[] rowA = new String[4];
         String[] rowB = new String[4];
+        String[] rowXA = {"X", "X", "X", "X"};
+        String[] rowXB = {"X", "X", "X", "X"};
         int [] columns = {1, 2, 3, 4};
         String level = "easy";
         int chances = 10;
@@ -65,33 +68,54 @@ public class Game {
             }
             for (int i = 0; i < 4; i++) {
                 rowB[i] = rowA[list4.get(i)];                
-            }           
+            }  
             }
-            public void print() {
-                
+            public static void printLine() {
+                for (int i = 0; i < 30; i++) {
+                    System.out.print("-");
+                }
+                System.out.println();
+            }           
+            public void play() {
+                Game1.printLine();
                 System.out.println("Level: " + level);
                 System.out.println("Guess chances: " + chances);
                 System.out.print("  ");
                 for (int i = 0; i < 4; i++){
-                    int length = rowA[i].length() + 1;
+                    int length = rowXA[i].length() + 1;
                     System.out.printf("%" + -length + "d", columns[i]);                   
                 }
                 System.out.println();
                 System.out.print("A ");
-                for (String word : rowA) {
+                for (String word : rowXA) {
                     System.out.print(word + " ");                    
                 }
                 System.out.println();
                 System.out.print("B ");
-                for (String word : rowB) {
+                for (String word : rowXB) {
                     System.out.print(word + " ");                    
                 }
                 System.out.println();
-
-
+                Game1.printLine();
+                String answer = Game1.enterAnswer();
+                System.out.println(answer);
             }
+            public static String enterAnswer() {
+                Scanner guess = new Scanner(System.in);
+                        System.out.println("Enter coordinates: ");
+                         String answer = guess.next().toUpperCase();
+                        
+                        int compareA = Character.compare(answer.charAt(0), 'A');
+                        int compareB = Character.compare(answer.charAt(0), 'B');
+                        int columnNumber = Character.getNumericValue(answer.charAt(1));
+                        System.out.println(columnNumber);
+                        if ((compareA != 0 && compareB != 0) || (columnNumber < 1 || columnNumber > 4)) {
+                            System.out.println("Invalid input");
+                            answer = Game1.enterAnswer();
+                        }
+                        return answer;
         }
-    
+    }
     
     public static void main(String[] args) {
         System.out.println("Welcome to the game!");
@@ -104,7 +128,7 @@ public class Game {
         
         if (level.difficulty == 1) {
             Game1 game = new Game1(data.wordArray);
-            game.print();
+            game.play();
         }
         else {
 
