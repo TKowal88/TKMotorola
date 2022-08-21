@@ -5,6 +5,8 @@ import java.util.InputMismatchException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.lang.Character;
+import java.util.regex.Pattern;
+import java.lang.StringIndexOutOfBoundsException; 
 
 public class Game {
     public static class Load {
@@ -35,10 +37,10 @@ public class Game {
         try {
             difficulty = digit.nextInt();
         } catch (InputMismatchException e) {
-            System.out.println("\nInput numbers only");
+            System.out.println("\n \nInput numbers only\n");
         }
-        }
- 
+        
+    }
     }
     public static class Game1 {
         String[] rowA = new String[4];
@@ -50,8 +52,7 @@ public class Game {
         int chances = 10;
         public Game1(String[] array){
             ArrayList<Integer> list100 = new ArrayList<Integer>();
-            ArrayList<Integer> list4 = new ArrayList<Integer>();
-            
+            ArrayList<Integer> list4 = new ArrayList<Integer>();          
 
             for (int i = 0; i < 100; i++) {
                 list100.add(i);
@@ -76,7 +77,8 @@ public class Game {
                 }
                 System.out.println();
             }           
-            public void play() {
+            public void play(String rows, int tries) {
+                int moves = tries;
                 Game1.printLine();
                 System.out.println("Level: " + level);
                 System.out.println("Guess chances: " + chances);
@@ -97,21 +99,47 @@ public class Game {
                 }
                 System.out.println();
                 Game1.printLine();
-                String answer = Game1.enterAnswer();
-                System.out.println(answer);
+                String options = rows;
+                String answer = enterAnswer(options);
+                char row = answer.charAt(0);
+                int column = Character.getNumericValue(answer.charAt(1));
+                if (row == 'A') {                    
+                    rowXA[column - 1] = rowA[column - 1];
+                    options = "B";
+
+                }
+                else {
+                    rowXB[column - 1] = rowB[column - 1];
+                    options = "A";
+                }
+                moves++;
+                if (moves % 2 != 0){
+                play(options, moves); 
+                } else if (options == "B") {
+                    System.out.println("compare A");
+                    options = "A-B";
+                    play(options,moves);
+                }
+                else {
+                    System.out.println("compare B");
+                    options = "A-B";
+                    play(options, moves);
+
+                }            
             }
-            public static String enterAnswer() {
+            public static String enterAnswer(String options) {
                 Scanner guess = new Scanner(System.in);
-                        System.out.println("Enter coordinates: ");
+                        try {
+                            System.out.println("Enter " + options.charAt(0) + " or " + options.charAt(2) + " coordinates: ");
+                        }
+                        catch (StringIndexOutOfBoundsException e) {
+                            System.out.println("Enter " + options + " coordinates: ");
+                        }
                          String answer = guess.next().toUpperCase();
-                        
-                        int compareA = Character.compare(answer.charAt(0), 'A');
-                        int compareB = Character.compare(answer.charAt(0), 'B');
-                        int columnNumber = Character.getNumericValue(answer.charAt(1));
-                        System.out.println(columnNumber);
-                        if ((compareA != 0 && compareB != 0) || (columnNumber < 1 || columnNumber > 4)) {
+                         boolean b = Pattern.matches("["+ options +"][1-4]", answer);                       
+                        if (!b) {
                             System.out.println("Invalid input");
-                            answer = Game1.enterAnswer();
+                            answer = enterAnswer(options);
                         }
                         return answer;
         }
@@ -121,14 +149,15 @@ public class Game {
         System.out.println("Welcome to the game!");
         Load data = new Load(); 
         Level level = new Level();
-        while (level.difficulty < 1 || level.difficulty > 2) {
-            System.out.println("\nPlease enter 1 or 2 only\n");
+        while (level.difficulty != 1 && level.difficulty != 2) {
+            System.out.println("\nEnter 1 or 2 only\n");
             level = new Level();
-        }   
+        }
+          
         
         if (level.difficulty == 1) {
             Game1 game = new Game1(data.wordArray);
-            game.play();
+            game.play("A-B", 0);
         }
         else {
 
