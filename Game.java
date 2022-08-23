@@ -172,7 +172,7 @@ public class Game {
                 printLine();
                 }
 
-                // This method takes in the user answer, validates whether it refers to a covered word,
+                // This method reads the user answer, validates whether it refers to a covered word,
                 // and returns 3 possible status codes. 1 to keep playing, 0 for game win and 2 for game over,
                 // based on how many succesful matches have been made and how many chances remaining does the user have
                 public int play() {
@@ -299,7 +299,7 @@ public class Game {
                     Scanner name = new Scanner(System.in);
                     System.out.println("Enter your name to save the score: ");
                     if (name.hasNext()) {
-                        player = name.next();
+                        player = name.nextLine();
                         enterHighscore();
                     }
                     return 0;
@@ -347,16 +347,72 @@ public class Game {
             // that is then appended to the high score csv file
             public void enterHighscore () {
                 String localDate = LocalDate.now().toString();
-                String entry = player + ", " + localDate + ", " + seconds + ", " + moves;
+                String entry = player + "," + localDate + "," + seconds + " seconds," + moves + " moves.";
                 try {
                 FileWriter highscoreWriter = new FileWriter("highscore.csv", true);
-                highscoreWriter.write(entry);
                 highscoreWriter.write(System.lineSeparator());
+                highscoreWriter.write(entry);              
                 highscoreWriter.close();
                 } catch (IOException e) {
                     System.out.println("An error occured");
                 }
             }
+            // The complete csv file is read into an ArrayList, then sorted by time,
+            // then the top 10 scores are displayed
+            public void displayHighscore () {
+                clearConsole();
+                ArrayList<Winner> winners = new ArrayList<Winner>();
+                try {
+                File highscoreReader = new File("highscore.csv");
+                Scanner reader = new Scanner(highscoreReader);               
+                while (reader.hasNextLine()) {
+                    String fields = reader.nextLine();
+                    String [] splitFields = fields.split(",");
+                    String nameField = splitFields[0];
+                    String dateField = splitFields[1];
+                    String timeField = splitFields[2];
+                    String movesField = splitFields[3];
+                    winners.add(new Winner(nameField, dateField, timeField, movesField));                                       
+                }
+                winners.sort((o1, o2) -> o1.time.compareTo(o2.time));
+                String[] headers = { "Name", "Date", "Time", "Moves" };           
+                System.out.println("High Scores\n");                                            
+                for (int i = 0; i < 4; i++) {
+                System.out.printf("%8s", headers[i]);
+                }
+                System.out.println();
+                System.out.println();
+                for (int i = 0; i < 10; i++) {
+                    try {
+                    System.out.print(winners.get(i).name + " ");
+                    System.out.print(winners.get(i).date + " ");
+                    System.out.print(winners.get(i).time + " ");
+                    System.out.println(winners.get(i).moves);
+                    System.out.println();
+                    } catch (IndexOutOfBoundsException e) {
+                    }
+                }
+                } catch (FileNotFoundException e) {
+                    System.out.println("Error reading the file");
+                }
+            }
+        }
+
+        // This is a class that is used to create Winner objects that are then loaded into
+        // the ArrayList by the displayHighscore function, and used to print the High Score list
+        public static class Winner {
+            String name;
+            String date;
+            String time;
+            String moves;
+
+            public Winner(String nameIn, String dateIn, String timeIn, String movesIn) {
+                name = nameIn;
+                date = dateIn;
+                time = timeIn;
+                moves = movesIn;
+            };
+
         }
        
     public static void main(String[] args) {
@@ -410,6 +466,7 @@ public class Game {
 
             // Ends the game, prompts for game restart
             if (status == 0 || status == 2) {
+                game.displayHighscore();
                 Scanner input = new Scanner(System.in);
                 System.out.println("Do you want to play again? Y/N: ");
                 restart = input.next().charAt(0);
