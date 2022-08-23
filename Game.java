@@ -8,6 +8,8 @@ import java.util.Collections;
 import java.lang.Character;
 import java.util.regex.Pattern;
 import java.lang.StringIndexOutOfBoundsException;
+import java.time.Duration;
+import java.time.Instant;
 
 // Top level Game class
 public class Game {
@@ -67,6 +69,9 @@ public class Game {
         // Chances counter
         int chances;
 
+        // Chances used counter
+        int chancesUsed;
+
         // Matches counter
         int matches;
 
@@ -78,6 +83,9 @@ public class Game {
         
         // Size of the game rows 4 (easy) or 8 (hard)
         int size;
+
+        // An Instant object that will be used to demarcate the beginning of the game
+        Instant beginning;
 
         // The constructor obtains the words in a randomized order and sets up the subarrays of level-dependent size
         public Gameplay(String[] array, int gamesize){
@@ -259,9 +267,22 @@ public class Game {
                 matches++;
                 options = "A-B";                           
                 if (matches == size) {
+
+                    // Marks the end of the game
+                    Instant end = Instant.now();
                     clearConsole();
-                    print();
+                    print();                                     
                     System.out.println("Congratulations. You win!");
+                    
+                    // Displays the amount of moves taken, chances used, and game duration
+                    System.out.println("You solved the memory game in " + moves + " moves.");
+                    if (chances == 1) {
+                        System.out.println("You used " + chancesUsed + " chance.");
+                    }
+                    else {
+                        System.out.println("You used " + chancesUsed + " chances.");
+                    }
+                    System.out.println("It took you " + Duration.between(beginning, end).getSeconds() + " seconds to solve the puzzle.");
                     return 0;
                 }
                 return 1; 
@@ -273,6 +294,7 @@ public class Game {
                 System.out.println("no match");
                 options = "A-B";
                 chances--;
+                chancesUsed++;
                 matches = 0;
                 System.out.println(chances + "chances");
                 clearConsole();                   
@@ -339,6 +361,9 @@ public class Game {
 
             // Clears the console, begins gameplay
             game.clearConsole();
+
+            // Marks the beginning of the game
+            game.beginning = Instant.now();
             game.print();    
             int status = game.play();
 
