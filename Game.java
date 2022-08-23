@@ -1,4 +1,5 @@
 import java.io.File;
+import java.io.FileWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Scanner;
@@ -10,6 +11,7 @@ import java.util.regex.Pattern;
 import java.lang.StringIndexOutOfBoundsException;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
 
 // Top level Game class
 public class Game {
@@ -86,6 +88,12 @@ public class Game {
 
         // An Instant object that will be used to demarcate the beginning of the game
         Instant beginning;
+
+        // The name of the player
+        String player;
+
+        // The seconds of game elapsed
+        long seconds;
 
         // The constructor obtains the words in a randomized order and sets up the subarrays of level-dependent size
         public Gameplay(String[] array, int gamesize){
@@ -274,15 +282,26 @@ public class Game {
                     print();                                     
                     System.out.println("Congratulations. You win!");
                     
-                    // Displays the amount of moves taken, chances used, and game duration
+                    // Displays the amount of moves taken, chances used
                     System.out.println("You solved the memory game in " + moves + " moves.");
-                    if (chances == 1) {
+                    if (chancesUsed == 1) {
                         System.out.println("You used " + chancesUsed + " chance.");
                     }
                     else {
                         System.out.println("You used " + chancesUsed + " chances.");
                     }
-                    System.out.println("It took you " + Duration.between(beginning, end).getSeconds() + " seconds to solve the puzzle.");
+
+                    // Gets the game duration and displays it
+                    seconds = Duration.between(beginning, end).getSeconds();
+                    System.out.println("It took you " + seconds + " seconds to solve the puzzle.");
+
+                    // Prompts the user for a name to enter into high score
+                    Scanner name = new Scanner(System.in);
+                    System.out.println("Enter your name to save the score: ");
+                    if (name.hasNext()) {
+                        player = name.next();
+                        enterHighscore();
+                    }
                     return 0;
                 }
                 return 1; 
@@ -322,7 +341,22 @@ public class Game {
                         System.out.print("\033\143");
                     }
                     } catch (IOException | InterruptedException ex) {}
-                }                   
+                }
+            
+            // This method combines the data into a comma-separated string, 
+            // that is then appended to the high score csv file
+            public void enterHighscore () {
+                String localDate = LocalDate.now().toString();
+                String entry = player + ", " + localDate + ", " + seconds + ", " + moves;
+                try {
+                FileWriter highscoreWriter = new FileWriter("highscore.csv", true);
+                highscoreWriter.write(entry);
+                highscoreWriter.write(System.lineSeparator());
+                highscoreWriter.close();
+                } catch (IOException e) {
+                    System.out.println("An error occured");
+                }
+            }
         }
        
     public static void main(String[] args) {
