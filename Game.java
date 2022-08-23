@@ -350,8 +350,8 @@ public class Game {
                 String entry = player + "," + localDate + "," + seconds + " seconds," + moves + " moves.";
                 try {
                 FileWriter highscoreWriter = new FileWriter("highscore.csv", true);
-                highscoreWriter.write(System.lineSeparator());
-                highscoreWriter.write(entry);              
+                highscoreWriter.write(entry); 
+                highscoreWriter.write(System.lineSeparator());             
                 highscoreWriter.close();
                 } catch (IOException e) {
                     System.out.println("An error occured");
